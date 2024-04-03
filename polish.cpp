@@ -1,3 +1,5 @@
+/*Brian Kyalo Kimanzi
+SCT221-0181/2023*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
