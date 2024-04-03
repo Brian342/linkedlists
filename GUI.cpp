@@ -1,57 +1,102 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
-// Define the BST node structure
-struct Node {
-    int data;
-    struct Node* left;
-    struct Node* right;
-};
+#define MAXSIZE 100
 
-// Function to create a new BST node
-struct Node* newNode(int item) {
-    struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
-    temp->data = item;
-    temp->left = temp->right = NULL;
-    return temp;
+char stack[MAXSIZE];
+int top = -1;
+
+char peek() {
+   return stack[top];
 }
 
-// Function to insert a node into the BST
-struct Node* insert(struct Node* root, int key) {
-    if (root == NULL)
-        return newNode(key);
-    if (key < root->data)
-        root->left = insert(root->left, key);
-    else if (key > root->data)
-        root->right = insert(root->right, key);
-    return root;
+int isEmpty() {
+   return top == -1;
 }
 
-// Function to create a BST from the given array
-struct Node* createBSTFromArray(int arr[], int n) {
-    struct Node* root = NULL;
-    for (int i = 0; i < n; i++)
-        root = insert(root, arr[i]);
-    return root;
+int isFull() {
+   return top == MAXSIZE - 1;
 }
 
-// Function to print the inorder traversal of the BST
-void inorder(struct Node* root) {
-    if (root == NULL)
-        return;
-    inorder(root->left);
-    printf("%d ", root->data);
-    inorder(root->right);
+void push(char elem) {
+   if (isFull()) {
+       printf("Stack Overflow\n");
+       exit(1);
+   }
+   stack[++top] = elem;
+}
+
+char pop() {
+   if (isEmpty()) {
+       printf("Stack Underflow\n");
+       exit(1);
+   }
+   return stack[top--];
+}
+
+int precedence(char op) {
+   switch (op) {
+       case '+':
+       case '-':
+           return 1;
+       case '*':
+       case '/':
+       case '%':
+           return 2;
+       default:
+           return 0;
+   }
+}
+
+void infixToPostfix(char *infix, char *postfix) {
+   int i, j;
+   char ch, popped;
+
+   push('(');
+   strcat(infix, ")");
+
+   i = 0;
+   j = 0;
+   ch = infix[i];
+
+   while (ch != '\0') {
+       if (ch == '(') {
+           push(ch);
+       } else if (isalnum(ch)) {
+           postfix[j++] = ch;
+       } else if (isOperator(ch)) {
+           while (precedence(peek()) >= precedence(ch)) {
+               popped = pop();
+               postfix[j++] = popped;
+           }
+           push(ch);
+       } else if (ch == ')') {
+           popped = pop();
+           while (popped != '(') {
+               postfix[j++] = popped;
+               popped = pop();
+           }
+       } else {
+           printf("Invalid infix Expression.\n");
+           exit(1);
+       }
+       i++;
+       ch = infix[i];
+   }
+
+   postfix[j] = '\0';
 }
 
 int main() {
-    int arr[] = {30, 20, 40, 10, 25, 35, 45, 5, 15};
-    int n = sizeof(arr) / sizeof(arr[0]);
+   char infix[MAXSIZE], postfix[MAXSIZE];
 
-    struct Node* root = createBSTFromArray(arr, n);
+   printf("Enter the infix expression: ");
+   fgets(infix, MAXSIZE, stdin);  // Use fgets for safer input
 
-    printf("Inorder traversal of the constructed BST:\n");
-    inorder(root);
+   infixToPostfix(infix, postfix);
 
-    return 0;
+   printf("Postfix expression: %s", postfix);
+
+   return 0;
 }
