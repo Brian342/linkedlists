@@ -1,8 +1,9 @@
 /*Brian Kyalo Kimanzi
 SCT221-0181/2023*/
-#include <stdio.h>
+#include <gtk/gtk.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 #define MAX_SIZE 100
 
@@ -83,15 +84,50 @@ void infixToPostfix(char infix[], char postfix[]) {
     postfix[j] = '\0';
 }
 
-int main() {
-    char infix[MAX_SIZE], postfix[MAX_SIZE];
-    
-    printf("Enter the infix expression: ");
-    fgets(infix, MAX_SIZE, stdin);
+void show_postfix(GtkWidget *widget, gpointer data) {
+    GtkTextBuffer *buffer = (GtkTextBuffer *)data;
+    GtkTextIter start, end;
+    char *infix, postfix[MAX_SIZE];
 
+    gtk_text_buffer_get_bounds(buffer, &start, &end);
+    infix = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
     infixToPostfix(infix, postfix);
+    g_free(infix);
 
-    printf("Postfix expression: %s\n", postfix);
+    GtkWidget *dialog;
+    dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Postfix expression: %s", postfix);
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
+int main(int argc, char *argv[]) {
+    GtkWidget *window, *vbox, *label, *textview, *button, *scroll;
+
+    gtk_init(&argc, &argv);
+
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+    vbox = gtk_vbox_new(FALSE, 5);
+    gtk_container_add(GTK_CONTAINER(window), vbox);
+
+    label = gtk_label_new("Enter the infix expression:");
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+
+    textview = gtk_text_view_new();
+    gtk_box_pack_start(GTK_BOX(vbox), textview, TRUE, TRUE, 0);
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(scroll), textview);
+    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
+
+    button = gtk_button_new_with_label("Convert to Postfix");
+    g_signal_connect(button, "clicked", G_CALLBACK(show_postfix), gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview)));
+    gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+
+    gtk_widget_show_all(window);
+
+    gtk_main();
 
     return 0;
 }
