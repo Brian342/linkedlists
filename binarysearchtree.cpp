@@ -23,7 +23,7 @@ struct Node* bst_construct(int* inOrder, int* postOrder, int inStart, int inEnd,
 
     (*postIndex)--;
 
-    // Find the index of root in in-order array
+    // Find the index of root in in-order arra
     int inIndex;
     for (inIndex = inStart; inIndex <= inEnd; inIndex++) {
         if (inOrder[inIndex] == root->data)
