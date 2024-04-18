@@ -42,7 +42,7 @@ void bfs_traversal(struct TreeNode* root) {
     if (root == NULL)
         return;
 
-    struct TreeNode* queue[100]; // Assuming a maximum of 100 nodes
+    struct TreeNode* queue[100];
     int front = 0, rear = 0;
     queue[rear++] = root;
 
@@ -67,9 +67,7 @@ int main() {
 
     printf("BFS Traversal of the constructed BST:\n");
     bfs_traversal(root);
-
-    // Free memory (optional)
-    // Add code here to free the dynamically allocated memory for the tree nodes
+   
 
     return 0;
 }
