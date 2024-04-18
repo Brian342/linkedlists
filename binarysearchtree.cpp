@@ -1,3 +1,6 @@
+/*Kaguchia Kago - SCT221-0522/2022
+Katra Noor Soyan - sct221-0397/2022
+Brian Kyalo Kimanzi - SCT221-0181/2023*/
 #include <stdio.h>
 #include <stdlib.h>
 
